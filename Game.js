@@ -5,60 +5,60 @@ import { Bird } from './components/Bird.js';
 import { Obstacles } from './components/Obstacles.js';
 import { SFX } from './libs/SFX.js';
 
-class Game{
-	constructor(){
-		const container = document.createElement( 'div' );
-		document.body.appendChild( container );
-        
+class Game {
+    constructor() {
+        const container = document.createElement('div');
+        document.body.appendChild(container);
+
         this.loadingBar = new LoadingBar();
         this.loadingBar.visible = false;
 
         this.clock = new THREE.Clock();
 
-		this.assetsPath = '../../assets/';
-        
-		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
-        this.camera.position.set( -4.37, 0, -4.75 );
+        this.assetsPath = '../../assets/';
+
+        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
+        this.camera.position.set(-4.37, 0, -4.75);
         this.camera.lookAt(0, 0, 6);
 
         this.cameraController = new THREE.Object3D();
         this.cameraController.add(this.camera);
-        this.cameraTarget = new THREE.Vector3(0,0,6);
-        
-		this.scene = new THREE.Scene();
+        this.cameraTarget = new THREE.Vector3(0, 0, 6);
+
+        this.scene = new THREE.Scene();
         this.scene.add(this.cameraController);
 
-		const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-        ambient.position.set( 0.5, 1, 0.25 );
-		this.scene.add(ambient);
-			
-		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true } );
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
+        const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        ambient.position.set(0.5, 1, 0.25);
+        this.scene.add(ambient);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.outputEncoding = THREE.sRGBEncoding;
-		container.appendChild( this.renderer.domElement );
+        container.appendChild(this.renderer.domElement);
         this.setEnvironment();
-        
+
         this.active = false;
         this.load();
 
-        window.addEventListener('resize', this.resize.bind(this) );
+        window.addEventListener('resize', this.resize.bind(this));
 
         document.addEventListener('keydown', this.keyDown.bind(this));
         document.addEventListener('keyup', this.keyUp.bind(this));
 
-        document.addEventListener('touchstart', this.mouseDown.bind(this) );
-        document.addEventListener('touchend', this.mouseUp.bind(this) );
-        document.addEventListener('mousedown', this.mouseDown.bind(this) );
-        document.addEventListener('mouseup', this.mouseUp.bind(this) );
-        
+        document.addEventListener('touchstart', this.mouseDown.bind(this));
+        document.addEventListener('touchend', this.mouseUp.bind(this));
+        document.addEventListener('mousedown', this.mouseDown.bind(this));
+        document.addEventListener('mouseup', this.mouseUp.bind(this));
+
         this.spaceKey = false;
 
         const btn = document.getElementById('playBtn');
         btn.addEventListener('click', this.startGame.bind(this));
-	}
-	
-    startGame(){
+    }
+
+    startGame() {
         const gameover = document.getElementById('gameover');
         const instructions = document.getElementById('instructions');
         const btn = document.getElementById('playBtn');
@@ -73,7 +73,7 @@ class Game{
 
         let elm = document.getElementById('score');
         elm.innerHTML = this.score;
-        
+
         elm = document.getElementById('lives');
         elm.innerHTML = this.lives;
 
@@ -85,55 +85,55 @@ class Game{
 
     }
 
-    resize(){
+    resize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
-    	this.camera.updateProjectionMatrix();
-    	this.renderer.setSize( window.innerWidth, window.innerHeight ); 
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    keyDown(evt){
-        switch(evt.keyCode){
+    keyDown(evt) {
+        switch (evt.keyCode) {
             case 32:
-                this.spaceKey = true; 
+                this.spaceKey = true;
                 break;
         }
     }
-    
-    keyUp(evt){
-        switch(evt.keyCode){
+
+    keyUp(evt) {
+        switch (evt.keyCode) {
             case 32:
                 this.spaceKey = false;
                 break;
         }
     }
 
-    mouseDown(evt){
+    mouseDown(evt) {
         this.spaceKey = true;
     }
 
-    mouseUp(evt){
+    mouseUp(evt) {
         this.spaceKey = false;
     }
 
-    setEnvironment(){
+    setEnvironment() {
         const loader = new RGBELoader().setPath(this.assetsPath);
-        const pmremGenerator = new THREE.PMREMGenerator( this.renderer );
+        const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
         pmremGenerator.compileEquirectangularShader();
-        
+
         const self = this;
-        
-        loader.load( 'hdr/venice_sunset_1k.hdr', ( texture ) => {
-          const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-          pmremGenerator.dispose();
 
-          self.scene.environment = envMap;
+        loader.load('hdr/venice_sunset_1k.hdr', (texture) => {
+            const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+            pmremGenerator.dispose();
 
-        }, undefined, (err)=>{
-            console.error( err.message );
-        } );
+            self.scene.environment = envMap;
+
+        }, undefined, (err) => {
+            console.error(err.message);
+        });
     }
-    
-	load(){
+
+    load() {
         this.loadSkybox();
         this.loading = true;
         this.loadingBar.visible = true;
@@ -144,7 +144,7 @@ class Game{
         this.loadSFX();
     }
 
-    loadSFX(){
+    loadSFX() {
         this.sfx = new SFX(this.camera, this.assetsPath + 'audio/');
 
         this.sfx.load('explosion');
@@ -154,10 +154,10 @@ class Game{
         this.sfx.load('bonus');
     }
 
-    loadSkybox(){
+    loadSkybox() {
         this.scene.background = new THREE.CubeTextureLoader()
-	        .setPath( `${this.assetsPath}paintedsky/` )
-            .load( [
+            .setPath(`${this.assetsPath}paintedsky/`)
+            .load([
                 'px.jpg',
                 'nx.jpg',
                 'py.jpg',
@@ -166,10 +166,10 @@ class Game{
                 'nz.jpg'
             ], () => {
                 this.renderer.setAnimationLoop(this.render.bind(this));
-            } );
+            });
     }
-    
-    gameOver(){
+
+    gameOver() {
         this.active = false;
 
         const gameover = document.getElementById('gameover');
@@ -184,47 +184,47 @@ class Game{
         this.sfx.play('gameover');
     }
 
-    incScore(){
+    incScore() {
         this.score++;
 
         const elm = document.getElementById('score');
 
-        if (this.score % 3==0){
+        if (this.score % 3 == 0) {
             this.bonusScore += 3;
             this.sfx.play('bonus');
-        }else{
+        } else {
             this.sfx.play('gliss');
         }
 
         elm.innerHTML = this.score + this.bonusScore;
     }
 
-    decLives(){
+    decLives() {
         this.lives--;
 
         const elm = document.getElementById('lives');
 
         elm.innerHTML = this.lives;
 
-        if (this.lives==0) setTimeout(this.gameOver.bind(this), 1200);
+        if (this.lives == 0) setTimeout(this.gameOver.bind(this), 1200);
 
         this.sfx.play('explosion');
     }
 
-    updateCamera(){
-        this.cameraController.position.copy( this.bird.position );
+    updateCamera() {
+        this.cameraController.position.copy(this.bird.position);
         this.cameraController.position.y = 0;
         this.cameraTarget.copy(this.bird.position);
         this.cameraTarget.z += 6;
-        this.camera.lookAt( this.cameraTarget );
+        this.camera.lookAt(this.cameraTarget);
     }
 
-	render() {
-        if (this.loading){
-            if (this.bird.ready && this.obstacles.ready){
+    render() {
+        if (this.loading) {
+            if (this.bird.ready && this.obstacles.ready) {
                 this.loading = false;
                 this.loadingBar.visible = false;
-            }else{
+            } else {
                 return;
             }
         }
@@ -234,13 +234,13 @@ class Game{
 
         this.bird.update(time);
 
-        if (this.active){
+        if (this.active) {
             this.obstacles.update(this.bird.position, dt);
         }
-    
+
         this.updateCamera();
-    
-        this.renderer.render( this.scene, this.camera );
+
+        this.renderer.render(this.scene, this.camera);
 
     }
 }
